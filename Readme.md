@@ -66,7 +66,7 @@ Add the token transformer plugin:
 **Note:** Get your GitHub token from your Traefik Solutions Architect
 
 ```bash
-# Replace <GITHUB_TOKEN> with the token from tokens.txt
+# Replace <GITHUB_TOKEN> with the token
 helm upgrade traefik traefik/traefik -n traefik --wait \
   --reset-then-reuse-values \
   --set experimental.plugins.traefikforwardauthpost.moduleName=github.com/carlosvillanua/traefikforwardauthpost \
