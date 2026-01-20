@@ -84,6 +84,11 @@ kubectl create namespace apps
 
 ## Step 8: Deploy HTTPBin Application with OIDC
 
+**Note:** Before deploying, edit `httpbin-oidc/1-middlewares.yaml` and configure your Azure AD credentials:
+- Replace `<TENANT_ID>` with your Azure AD tenant ID
+- Replace `<CLIENT_ID>` with your application client ID
+- Replace `<CLIENT_SECRET>` with your application client secret
+
 Deploy the HTTPBin application with OIDC middlewares and routes:
 
 ```bash
