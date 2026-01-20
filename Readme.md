@@ -61,7 +61,7 @@ helm upgrade --install --namespace traefik traefik traefik/traefik \
 
 ## Step 6: Configure Traefik Plugins
 
-Add the custom OIDC plugin and token transformer plugin:
+Add the token transformer plugin:
 
 **Note:** Get your GitHub token from your Traefik Solutions Architect
 
