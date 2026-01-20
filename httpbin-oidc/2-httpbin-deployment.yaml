@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin
+  template:
+    metadata:
+      labels:
+        app: httpbin
+    spec:
+      containers:
+      - name: httpbin
+        image: kennethreitz/httpbin
+        env:
+        - name: GUNICORN_CMD_ARGS
+          value: "--log-level=debug --access-logfile=- --error-logfile=- --access-logformat='%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\"'"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin-svc
+  namespace: apps
+spec:
+  selector:
+    app: httpbin
+  ports:
+    - port: 80
+      protocol: TCP
+      name: http
+      targetPort: 80

@@ -1,0 +1,59 @@
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: httpbin-route-secured
+  namespace: apps
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`localhost`) && PathPrefix(`/oidc`)
+      services:
+        - name: httpbin-svc
+          namespace: apps
+          port: 80
+      middlewares:
+        - name: oidc
+        - name: token-transformer
+        - name: strip-prefix-secured
+
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: oidc-callback
+  namespace: apps
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`localhost`) && PathPrefix(`/callback`)
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: oidc
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: oidc-logout
+  namespace: apps
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`localhost`) && PathPrefix(`/logout`)
+      services:
+        - name: noop@internal
+          kind: TraefikService
+      middlewares:
+        - name: oidc

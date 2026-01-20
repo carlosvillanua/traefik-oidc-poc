@@ -1,0 +1,71 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-prefix-secured
+  namespace: apps
+spec:
+  stripPrefix:
+    prefixes:
+      - "/oidc"
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: oidc
+  namespace: apps
+spec:
+  plugin:
+    oidc:
+      issuer: "https://sts.windows.net/<TENANT_ID>/"
+      redirectUrl: "http://localhost/callback"
+      logoutUrl: "/logout"
+      clientID: "<CLIENT_ID>"
+      clientSecret: "<CLIENT_SECRET>"
+      scopes:
+        - openid
+        - profile
+        - email
+      forwardHeaders:
+        X-Forwarded-User: preferred_username
+        Authorization: access_token
+      
+      session:
+        expiry: 120
+        sliding: true
+        refresh: true
+        httpOnly: true
+        secure: true
+        sameSite: lax
+        path: "/"
+        store:
+          redis:
+            endpoints:
+              - valkey.traefik.svc.cluster.local:6379
+            username: "traefik"
+            password: "traefik"
+
+      stateCookie:
+        store:
+          redis:
+            endpoints:
+              - valkey.traefik.svc.cluster.local:6379
+            username: "traefik"
+            password: "traefik"
+            
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: token-transformer
+  namespace: apps
+spec:
+  plugin:
+    traefikforwardauthpost:
+      address: http://httpbin-svc.apps.svc.cluster.local/anything/transformers/default
+      authRequestHeaders:
+        - Authorization
+      authResponseHeaders:
+        - Authorization
